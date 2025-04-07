@@ -1,78 +1,96 @@
-/**
- * Core user interface representing a platform member
- * Stores essential user information and profile details
- */
-export interface User {
-  id: string; // Unique identifier for the user
-  name: string; // Full name of the user
-  email: string; // Email address used for login and notifications
-  avatar?: string; // Optional URL path to user's profile picture
-  bio?: string; // Optional user biography or description
-  subtitle?: string; // Optional short professional title or role description
-  joinDate?: string; // Optional date when user joined the platform
-  role: string; // User role in the system (admin, moderator, regular user, etc.)
-  createdAt: string; // ISO timestamp of when the user was created
-}
+import { Database, Json, Tables } from "./database.types";
 
 /**
- * Comment interface representing user feedback on posts
- * Contains the comment content and metadata for traceability
+ * User type mapped directly from the database tables
  */
-export interface Comment {
-  id: string; // Unique identifier for each comment
-  userId: string; // Reference to the user who created the comment
-  postId: string; // Reference to the post being commented on
-  content: string; // Text content of the comment
-  createdAt: string; // ISO timestamp when comment was created
-}
+export type User = Tables<"users"> & {
+  // Extended properties
+  connections?: UserConnection[];
+  posts?: Post[];
+  preferences?: UserPreferences;
+  roles?: UserRole[];
+};
 
 /**
- * Post interface representing user-generated content
- * Contains the post content and metadata for engagement metrics
+ * Post type mapped directly from the database tables
  */
-export interface Post {
-  id: string; // Unique identifier for the post
-  userId: string; // ID of the user who created the post
-  content: string; // Main text content of the post
-  createdAt: string; // ISO timestamp of when the post was created
-  likes: number; // Count of likes/upvotes received
-  comments: number; // Count of comments received
-  commentsList?: Comment[]; // Optional array of actual comment objects for expanded view
-  weight: number; // Numerical weight used for network visualization importance
-  tags?: string[]; // Optional array of topic tags for categorization and filtering
-  edited?: boolean; // Optional flag indicating if post was edited after creation
-}
+export type Post = Tables<"posts"> & {
+  // Extended properties
+  tags?: string[];
+  author?: User;
+  commentsList?: Comment[];
+};
 
 /**
- * Network node interface used for visualization
- * Represents a post in the network graph for visual data representation
+ * Comment type mapped directly from the database tables
+ */
+export type Comment = Tables<"comments"> & {
+  // Extended properties
+  author?: User;
+};
+
+/**
+ * User connection type mapped directly from the database tables
+ */
+export type UserConnection = Tables<"user_connections">;
+
+/**
+ * User role type mapped directly from the database tables
+ */
+export type UserRole = Tables<"user_roles">;
+
+/**
+ * User preferences type mapped directly from the database tables
+ */
+export type UserPreferences = Tables<"user_preferences">;
+
+/**
+ * Network node for visualization
  */
 export interface NetworkNode {
-  id: string; // Unique identifier matching a post ID
-  label: string; // Display label (typically user name)
-  value: number; // Size value for visualization (based on weight)
-  group?: string; // Optional grouping category for visual clustering
+  id: string;
+  label: string;
+  value?: number;
+  title?: string;
+  group?: string;
+  x?: number;
+  y?: number;
 }
 
 /**
- * Network edge interface used for visualization
- * Represents a connection between posts in the network visualization
+ * Network edge for visualization
  */
 export interface NetworkEdge {
-  from: string; // ID of the source post (origin of connection)
-  to: string; // ID of the target post connected to the source
-  value: number; // Strength/width of the connection for visual emphasis
-  title?: string; // Optional hover text describing the connection relationship
+  id: string;
+  from: string;
+  to: string;
+  value?: number;
+  title?: string;
+  label?: string;
 }
 
 /**
  * Container for network visualization data
- * Combines nodes and edges for complete graph representation
  */
 export interface NetworkData {
-  nodes: NetworkNode[]; // Collection of all nodes in the network
-  edges: NetworkEdge[]; // Collection of all connections between nodes
+  nodes: NetworkNode[];
+  edges: NetworkEdge[];
 }
+
+/**
+ * Profile visibility type
+ */
+export type ProfileVisibility = Database["public"]["Enums"]["visibility_type"];
+
+/**
+ * Application role type
+ */
+export type AppRole = Database["public"]["Enums"]["app_role"];
+
+/**
+ * Application permission type
+ */
+export type AppPermission = Database["public"]["Enums"]["app_permission"];
 
 /**
  * State interface defining the structure of the application state
@@ -101,7 +119,7 @@ export interface AppState {
   highContrast: boolean; // Accessibility preference for increased visual contrast
   emailNotifications: boolean; // Preference for email notification delivery
   pushNotifications: boolean; // Preference for push notification delivery
-  profileVisibility: "public" | "contacts" | "private"; // Profile privacy setting
+  profileVisibility: Database["public"]["Enums"]["visibility_type"]; // Profile privacy setting
 
   // Action methods - User management
   setUser: (user: User) => void; // Set the current user
@@ -136,7 +154,9 @@ export interface AppState {
   setHighContrast: (highContrast: boolean) => void; // Update contrast preference
   setEmailNotifications: (enabled: boolean) => void; // Update email notification preference
   setPushNotifications: (enabled: boolean) => void; // Update push notification preference
-  setProfileVisibility: (visibility: "public" | "contacts" | "private") => void; // Update profile visibility
+  setProfileVisibility: (
+    visibility: Database["public"]["Enums"]["visibility_type"]
+  ) => void; // Update profile visibility
 }
 
 /**
@@ -155,7 +175,7 @@ export interface DataCache {
   highContrast: boolean; // Cached contrast preference
   emailNotifications: boolean; // Cached email notification preference
   pushNotifications: boolean; // Cached push notification preference
-  profileVisibility: "public" | "contacts" | "private"; // Cached profile visibility
+  profileVisibility: Database["public"]["Enums"]["visibility_type"]; // Cached profile visibility
 }
 
 /**
@@ -163,3 +183,172 @@ export interface DataCache {
  * Provides type-safe access to the application state
  */
 export type AppData = AppState;
+
+/**
+ * Parameters for getting a user by ID
+ */
+export interface GetUserParams {
+  userId: string;
+}
+
+/**
+ * Parameters for getting user preferences
+ */
+export interface GetUserPreferencesParams {
+  userId?: string;
+}
+
+/**
+ * Parameters for updating a user
+ */
+export interface UpdateUserParams {
+  userId: string;
+  name?: string;
+  email?: string;
+  avatar?: string;
+  bio?: string;
+  subtitle?: string;
+}
+
+/**
+ * Parameters for getting a post by ID
+ */
+export interface GetPostParams {
+  postId: string;
+}
+
+/**
+ * Parameters for adding a new post
+ */
+export interface AddPostParams {
+  content: string;
+  weight?: number;
+  tags?: string[];
+}
+
+/**
+ * Parameters for updating a post
+ */
+export interface UpdatePostParams {
+  postId: string;
+  content?: string;
+  weight?: number;
+  tags?: string[];
+}
+
+/**
+ * Parameters for removing a post
+ */
+export interface RemovePostParams {
+  postId: string;
+}
+
+/**
+ * Parameters for adding a comment to a post
+ */
+export interface AddCommentParams {
+  postId: string;
+  content: string;
+}
+
+/**
+ * Parameters for updating a comment
+ */
+export interface UpdateCommentParams {
+  commentId: string;
+  content: string;
+}
+
+/**
+ * Parameters for removing a comment
+ */
+export interface RemoveCommentParams {
+  commentId: string;
+}
+
+/**
+ * Parameters for updating network data
+ */
+export interface UpdateNetworkDataParams {
+  nodes: NetworkNode[];
+  edges: NetworkEdge[];
+}
+/**
+ * Parameters for updating user preferences
+ */
+export interface UpdateUserPreferencesParams {
+  theme?: string;
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  profileVisibility?: import("./database.types").Database["public"]["Enums"]["visibility_type"];
+}
+
+/**
+ * Parameters for adding a connection between users
+ */
+export interface AddConnectionParams {
+  connectedUserId: string;
+}
+
+/**
+ * Parameters for accepting a connection request
+ */
+export interface AcceptConnectionParams {
+  userId: string;
+}
+
+/**
+ * Parameters for removing a connection between users
+ */
+export interface RemoveConnectionParams {
+  connectedUserId: string;
+}
+
+export type RPCParamsMap = {
+  accept_connection: { p_user_id: string };
+  add_comment: { p_post_id: string; p_content: string };
+  add_connection: { p_connected_user_id: string };
+  add_post: { p_content: string; p_weight?: number; p_tags?: string[] };
+  are_users_connected: { user_id1: string; user_id2: string };
+  authorize: {
+    requested_permission: Database["public"]["Enums"]["app_permission"];
+  };
+  can_view_user_profile: { profile_user_id: string };
+  custom_access_token_hook: { event: Json };
+  get_network_data: Record<string, never>;
+  get_post: { post_id: string };
+  get_posts: Record<string, never>;
+  get_user: { user_id: string };
+  get_user_preferences: { p_user_id?: string };
+  get_users: Record<string, never>;
+  remove_comment: { p_comment_id: string };
+  remove_connection: { p_connected_user_id: string };
+  remove_post: { p_post_id: string };
+  setup_initial_admin: { admin_email: string };
+  update_comment: { p_comment_id: string; p_content: string };
+  update_network_data: { p_nodes: Json; p_edges: Json };
+  update_post: {
+    p_post_id: string;
+    p_content?: string;
+    p_weight?: number;
+    p_tags?: string[];
+  };
+  update_user: {
+    p_user_id: string;
+    p_name?: string;
+    p_email?: string;
+    p_avatar?: string;
+    p_bio?: string;
+    p_subtitle?: string;
+  };
+  update_user_preferences: {
+    p_theme?: string;
+    p_reduce_motion?: boolean;
+    p_high_contrast?: boolean;
+    p_email_notifications?: boolean;
+    p_push_notifications?: boolean;
+    p_profile_visibility?: Database["public"]["Enums"]["visibility_type"];
+  };
+};
