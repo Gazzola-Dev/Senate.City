@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppData } from "@/Providers/AppProvider";
 import * as actions from "@/actions/app.actions";
+import useAppData from "@/hooks/useAppData";
 import {
   AddCommentParams,
   Comment,
@@ -17,7 +17,7 @@ import { useCallback, useState } from "react";
 export const useComments = () => {
   const {
     posts,
-
+    user,
     addComment: addCommentToStore,
     updateComment: updateCommentInStore,
     removeComment: removeCommentFromStore,
@@ -25,7 +25,6 @@ export const useComments = () => {
     setError,
   } = useAppData();
 
-  const { user } = useAppData();
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [commentsError, setCommentsError] = useState<string | null>(null);
 
@@ -34,6 +33,7 @@ export const useComments = () => {
    */
   const addComment = useCallback(
     async (params: AddCommentParams) => {
+      if (!user) return null;
       setIsLoadingComments(true);
       setCommentsError(null);
       setLoading(true);

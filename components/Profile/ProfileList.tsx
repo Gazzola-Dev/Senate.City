@@ -1,11 +1,12 @@
-// components/profile-list.tsx
 "use client";
 
 import { InviteModal } from "@/components/Layout/InviteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAppData } from "@/Providers/AppProvider";
+import { useConnections } from "@/hooks/useConnections";
+import { useUser } from "@/hooks/useUser";
+
 import { User } from "@/types/app.types";
 import {
   MessageSquare,
@@ -14,7 +15,7 @@ import {
   Search,
   Share2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function ProfileList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,10 +24,16 @@ export function ProfileList() {
     string | null
   >(null);
 
-  const { users } = useAppData();
+  const { users, fetchUsers, isLoadingUser } = useUser();
+  const { addConnection, isLoadingConnections } = useConnections();
+
+  useEffect(() => {
+    // Fetch users when component mounts
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Filter users based on search query
-  const filteredUsers = users.filter((user) =>
+  const filteredUsers = users?.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -45,6 +52,16 @@ export function ProfileList() {
       setExpandedProfile(userId);
       setDoubleExpandedProfile(null);
     }
+  };
+
+  const handleConnect = async (userId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await addConnection({ connectedUserId: userId });
+  };
+
+  const handleShare = (userId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("Share profile:", userId);
   };
 
   return (
@@ -69,17 +86,24 @@ export function ProfileList() {
         </InviteModal>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto">
-        {filteredUsers.map((user) => (
-          <ProfileListItem
-            key={user.id}
-            user={user}
-            isExpanded={expandedProfile === user.id}
-            isDoubleExpanded={doubleExpandedProfile === user.id}
-            onClick={() => handleProfileClick(user.id)}
-          />
-        ))}
-      </div>
+      {isLoadingUser ? (
+        <div className="flex justify-center p-8">Loading profiles...</div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto">
+          {filteredUsers.map((user) => (
+            <ProfileListItem
+              key={user.id}
+              user={user}
+              isExpanded={expandedProfile === user.id}
+              isDoubleExpanded={doubleExpandedProfile === user.id}
+              onClick={() => handleProfileClick(user.id)}
+              onConnect={(e) => handleConnect(user.id, e)}
+              onShare={(e) => handleShare(user.id, e)}
+              isConnecting={isLoadingConnections}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -89,6 +113,9 @@ interface ProfileListItemProps {
   isExpanded: boolean;
   isDoubleExpanded: boolean;
   onClick: () => void;
+  onConnect: (e: React.MouseEvent) => void;
+  onShare: (e: React.MouseEvent) => void;
+  isConnecting: boolean;
 }
 
 function ProfileListItem({
@@ -96,6 +123,9 @@ function ProfileListItem({
   isExpanded,
   isDoubleExpanded,
   onClick,
+  onConnect,
+  onShare,
+  isConnecting,
 }: ProfileListItemProps) {
   let className =
     "transition-all duration-300 ease-in-out bg-gray-50 dark:bg-gray-700 rounded-lg p-3 cursor-pointer";
@@ -110,10 +140,7 @@ function ProfileListItem({
   }
   // Double expanded (taller)
   else if (isDoubleExpanded) {
-    const aspectRatio = 1.33;
-    className += ` col-span-2 grid grid-rows-[auto_auto_auto] gap-2 h-[${
-      aspectRatio * 100
-    }%]`;
+    className += " col-span-2 grid grid-rows-[auto_auto_auto] gap-2";
   }
 
   return (
@@ -127,7 +154,7 @@ function ProfileListItem({
       {!isExpanded && !isDoubleExpanded && (
         <Avatar className="h-14 w-14">
           <AvatarImage
-            src={user.avatar}
+            src={user.avatar ?? ""}
             alt={user.name}
           />
           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -139,7 +166,7 @@ function ProfileListItem({
         <>
           <Avatar className="h-10 w-10 mr-3">
             <AvatarImage
-              src={user.avatar}
+              src={user.avatar ?? ""}
               alt={user.name}
             />
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -154,7 +181,7 @@ function ProfileListItem({
           <div className="flex items-start mb-2">
             <Avatar className="h-12 w-12 mr-3">
               <AvatarImage
-                src={user.avatar}
+                src={user.avatar ?? ""}
                 alt={user.name}
               />
               <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -173,6 +200,10 @@ function ProfileListItem({
             <Button
               size="sm"
               variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("Message user:", user.id);
+              }}
             >
               <MessageSquare className="h-4 w-4 mr-1" />
               Message
@@ -180,6 +211,16 @@ function ProfileListItem({
             <Button
               size="sm"
               variant="ghost"
+              onClick={onConnect}
+              disabled={isConnecting}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Connect
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onShare}
             >
               <Share2 className="h-4 w-4 mr-1" />
               Share
@@ -187,6 +228,10 @@ function ProfileListItem({
             <Button
               size="sm"
               variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("More options for user:", user.id);
+              }}
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>

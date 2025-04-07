@@ -27,12 +27,19 @@ export const useAppInitialization = () => {
 
       try {
         // Fetch initial data in parallel for better performance
-        await Promise.all([
+        const res = await Promise.all([
           fetchUser(userId),
           fetchPosts(),
           fetchNetworkData(),
           fetchUserPreferences(userId),
         ]);
+        const [userData, postsData, networkData, preferencesData] = res;
+        console.log({
+          userData,
+          postsData,
+          networkData,
+          preferencesData,
+        });
 
         setIsInitialized(true);
       } catch (error) {

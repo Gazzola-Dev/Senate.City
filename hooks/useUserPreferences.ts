@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppData } from "@/Providers/AppProvider";
 import * as actions from "@/actions/app.actions";
+import useAppData from "@/hooks/useAppData";
 import {
   UpdateUserPreferencesParams,
   UserPreferences,
@@ -103,20 +103,20 @@ export const useUserPreferences = () => {
       if (params.theme !== undefined) {
         setTheme(params.theme as "light" | "dark" | "system");
       }
-      if (params.reduceMotion !== undefined) {
-        setReduceMotion(params.reduceMotion);
+      if (params.reduce_motion !== undefined) {
+        setReduceMotion(params.reduce_motion);
       }
-      if (params.highContrast !== undefined) {
-        setHighContrast(params.highContrast);
+      if (params.high_contrast !== undefined) {
+        setHighContrast(params.high_contrast);
       }
-      if (params.emailNotifications !== undefined) {
-        setEmailNotifications(params.emailNotifications);
+      if (params.email_notifications !== undefined) {
+        setEmailNotifications(params.email_notifications);
       }
-      if (params.pushNotifications !== undefined) {
-        setPushNotifications(params.pushNotifications);
+      if (params.push_notifications !== undefined) {
+        setPushNotifications(params.push_notifications);
       }
-      if (params.profileVisibility !== undefined) {
-        setProfileVisibility(params.profileVisibility);
+      if (params.profile_visibility !== undefined) {
+        setProfileVisibility(params.profile_visibility);
       }
 
       try {

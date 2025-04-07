@@ -98,7 +98,7 @@ export type AppPermission = Database["public"]["Enums"]["app_permission"];
  */
 export interface AppState {
   // User data
-  user: User; // Current logged-in user
+  user: User | null; // Current logged-in user
   users: User[]; // All users in the system for reference
 
   // Post data
@@ -122,7 +122,7 @@ export interface AppState {
   profileVisibility: Database["public"]["Enums"]["visibility_type"]; // Profile privacy setting
 
   // Action methods - User management
-  setUser: (user: User) => void; // Set the current user
+  setUser: (user: User | null) => void; // Set the current user
   setUsers: (users: User[]) => void; // Set all users in the system
   updateUser: (updatedUser: Partial<User> & { id: string }) => void; // Update a specific user
 
@@ -205,9 +205,9 @@ export interface UpdateUserParams {
   userId: string;
   name?: string;
   email?: string;
-  avatar?: string;
-  bio?: string;
-  subtitle?: string;
+  avatar?: string | null;
+  bio?: string | null;
+  subtitle?: string | null;
 }
 
 /**
@@ -229,10 +229,9 @@ export interface AddPostParams {
 /**
  * Parameters for updating a post
  */
-export interface UpdatePostParams {
+export interface UpdatePostParams
+  extends Omit<Database["public"]["Tables"]["posts"]["Update"], "id"> {
   postId: string;
-  content?: string;
-  weight?: number;
   tags?: string[];
 }
 
@@ -254,9 +253,12 @@ export interface AddCommentParams {
 /**
  * Parameters for updating a comment
  */
-export interface UpdateCommentParams {
+export interface UpdateCommentParams
+  extends Omit<
+    Database["public"]["Tables"]["comments"]["Update"],
+    "id" | "post_id" | "user_id"
+  > {
   commentId: string;
-  content: string;
 }
 
 /**
@@ -273,16 +275,17 @@ export interface UpdateNetworkDataParams {
   nodes: NetworkNode[];
   edges: NetworkEdge[];
 }
+
 /**
  * Parameters for updating user preferences
  */
 export interface UpdateUserPreferencesParams {
   theme?: string;
-  reduceMotion?: boolean;
-  highContrast?: boolean;
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  profileVisibility?: import("./database.types").Database["public"]["Enums"]["visibility_type"];
+  reduce_motion?: boolean;
+  high_contrast?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  profile_visibility?: Database["public"]["Enums"]["visibility_type"];
 }
 
 /**
@@ -339,9 +342,9 @@ export type RPCParamsMap = {
     p_user_id: string;
     p_name?: string;
     p_email?: string;
-    p_avatar?: string;
-    p_bio?: string;
-    p_subtitle?: string;
+    p_avatar?: string | null;
+    p_bio?: string | null;
+    p_subtitle?: string | null;
   };
   update_user_preferences: {
     p_theme?: string;

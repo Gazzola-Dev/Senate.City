@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useConnections } from "@/hooks/useConnections";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useState } from "react";
 
@@ -20,6 +21,7 @@ export function InviteModal({ children }: { children: React.ReactNode }) {
   const [emails, setEmails] = useState("");
   const [useMultiple, setUseMultiple] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { addConnection, isLoadingConnections } = useConnections();
 
   const onClose = () => {
     setIsOpen(false);
@@ -40,15 +42,19 @@ export function InviteModal({ children }: { children: React.ReactNode }) {
     return emailList.some(isValidEmail);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (useMultiple) {
-      console.log(
-        "Inviting multiple users:",
-        emails.split(",").map((e) => e.trim())
-      );
+      const emailList = emails
+        .split(",")
+        .map((e) => e.trim())
+        .filter(isValidEmail);
+      for (const emailAddress of emailList) {
+        await addConnection({ connectedUserId: emailAddress });
+      }
     } else {
-      console.log("Inviting user:", email);
+      await addConnection({ connectedUserId: email });
     }
+
     // Reset form and close modal
     setEmail("");
     setEmails("");
@@ -124,9 +130,9 @@ export function InviteModal({ children }: { children: React.ReactNode }) {
           <Button
             type="submit"
             onClick={handleSubmit}
-            disabled={!hasValidEmails()}
+            disabled={!hasValidEmails() || isLoadingConnections}
           >
-            Send Invites
+            {isLoadingConnections ? "Sending..." : "Send Invites"}
           </Button>
         </DialogFooter>
       </DialogContent>

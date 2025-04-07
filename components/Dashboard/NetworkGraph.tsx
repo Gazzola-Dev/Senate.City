@@ -1,15 +1,13 @@
 "use client";
-import { useAppData } from "@/Providers/AppProvider";
+import { useNetworkData } from "@/hooks/useNetworkData";
 import { useEffect, useRef } from "react";
 
-// Note: This is a mockup component for the network visualization
-// In a real implementation, you would use a library like vis-network, react-force-graph, or D3.js
 interface NetworkGraphProps {
   onNodeClick: (nodeId: string) => void;
 }
 
 const NetworkGraph = ({ onNodeClick }: NetworkGraphProps) => {
-  const { networkData } = useAppData();
+  const { networkData } = useNetworkData();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,8 +60,11 @@ const NetworkGraph = ({ onNodeClick }: NetworkGraphProps) => {
       line.setAttribute("y1", sourceY.toString());
       line.setAttribute("x2", targetX.toString());
       line.setAttribute("y2", targetY.toString());
-      line.setAttribute("stroke", `rgba(0, 0, 0, ${0.1 + edge.value * 0.05})`);
-      line.setAttribute("stroke-width", edge.value.toString());
+      line.setAttribute(
+        "stroke",
+        `rgba(0, 0, 0, ${0.1 + (edge?.value ?? 0) * 0.05})`
+      );
+      line.setAttribute("stroke-width", (edge.value ?? "").toString());
 
       svg.appendChild(line);
     });
@@ -83,7 +84,7 @@ const NetworkGraph = ({ onNodeClick }: NetworkGraphProps) => {
 
       circle.setAttribute("cx", x.toString());
       circle.setAttribute("cy", y.toString());
-      circle.setAttribute("r", (10 + node.value).toString());
+      circle.setAttribute("r", (10 + (node.value || 0)).toString());
       circle.setAttribute("fill", `hsl(${(index * 40) % 360}, 70%, 60%)`);
       circle.setAttribute("data-id", node.id);
       circle.style.cursor = "pointer";

@@ -1,3 +1,4 @@
+import { createClient } from "@/clients/action-client";
 import {
   AcceptConnectionParams,
   AddCommentParams,
@@ -22,15 +23,7 @@ import {
   UserPreferences,
 } from "@/types/app.types";
 import { Database, Json } from "@/types/database.types";
-import { createClient } from "@supabase/supabase-js";
-/**
- * Helper function to create a supabase client
- */
-const createSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-  return createClient<Database>(supabaseUrl, supabaseAnonKey);
-};
+
 /**
  * Generic function to call Supabase RPC functions with proper typing
  *
@@ -45,7 +38,7 @@ const callRPC = async <
   functionName: F,
   params?: RPCParamsMap[F]
 ): Promise<{ data: T | null; error: unknown | null }> => {
-  const supabase = createSupabaseClient();
+  const supabase = await createClient();
   try {
     const { data, error } = await supabase.rpc(functionName, params || {});
     if (error) throw error;
@@ -171,19 +164,19 @@ export const getUserPreferences = async ({
 };
 export const updateUserPreferences = async ({
   theme,
-  reduceMotion,
-  highContrast,
-  emailNotifications,
-  pushNotifications,
-  profileVisibility,
+  reduce_motion,
+  high_contrast,
+  email_notifications,
+  push_notifications,
+  profile_visibility,
 }: UpdateUserPreferencesParams) => {
   return callRPC<UserPreferences>("update_user_preferences", {
     p_theme: theme,
-    p_reduce_motion: reduceMotion,
-    p_high_contrast: highContrast,
-    p_email_notifications: emailNotifications,
-    p_push_notifications: pushNotifications,
-    p_profile_visibility: profileVisibility,
+    p_reduce_motion: reduce_motion,
+    p_high_contrast: high_contrast,
+    p_email_notifications: email_notifications,
+    p_push_notifications: push_notifications,
+    p_profile_visibility: profile_visibility,
   });
 };
 /**

@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 
 import * as actions from "@/actions/app.actions";
-import { useAppData } from "@/Providers/AppProvider";
+import useAppData from "@/hooks/useAppData";
 import {
   AddPostParams,
   Post,
@@ -111,7 +111,7 @@ export const usePosts = () => {
         content: params.content,
         weight: params.weight || 1,
         tags: params.tags || [],
-        user_id: user.id,
+        user_id: user?.id ?? "",
         comments: 0,
         likes: 0,
         edited: false,
@@ -150,7 +150,7 @@ export const usePosts = () => {
         setLoading(false);
       }
     },
-    [user.id, addPostToStore, removePostFromStore, setLoading, setError]
+    [user?.id, addPostToStore, removePostFromStore, setLoading, setError]
   );
 
   /**

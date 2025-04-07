@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppData } from "@/Providers/AppProvider";
 import * as actions from "@/actions/app.actions";
+import useAppData from "@/hooks/useAppData";
 import { AddConnectionParams, RemoveConnectionParams } from "@/types/app.types";
 import { createId } from "@paralleldrive/cuid2";
 import { useCallback, useState } from "react";
@@ -26,6 +26,7 @@ export const useConnections = () => {
    */
   const addConnection = useCallback(
     async (params: AddConnectionParams) => {
+      if (!user) return null;
       setIsLoadingConnections(true);
       setConnectionsError(null);
       setLoading(true);
@@ -43,7 +44,7 @@ export const useConnections = () => {
       // Create optimistic connection
       const optimisticConnection = {
         id: `temp-${createId()}`,
-        user_id: user.id,
+        user_id: user?.id,
         connected_user_id: params.connectedUserId,
         status: "pending",
         created_at: new Date().toISOString(),
@@ -52,11 +53,11 @@ export const useConnections = () => {
       // Add connection to current user
       const updatedUser = {
         ...user,
-        connections: [...(user.connections || []), optimisticConnection],
+        connections: [...(user?.connections || []), optimisticConnection],
       };
 
       // Apply optimistic update
-      updateUserInStore({ ...updatedUser, id: user.id });
+      updateUserInStore({ ...updatedUser, id: user?.id });
 
       try {
         const { data, error } = await actions.addConnection(params);
@@ -72,13 +73,13 @@ export const useConnections = () => {
       } catch (error) {
         // Rollback on error
         const originalConnections =
-          user.connections?.filter(
+          user?.connections?.filter(
             (conn) => conn.connected_user_id !== params.connectedUserId
           ) || [];
 
         updateUserInStore({
           ...user,
-          id: user.id,
+          id: user?.id,
           connections: originalConnections,
         });
 
@@ -100,12 +101,13 @@ export const useConnections = () => {
    */
   const acceptConnection = useCallback(
     async (params: { userId: string }) => {
+      if (!user) return null;
       setIsLoadingConnections(true);
       setConnectionsError(null);
       setLoading(true);
 
       // Find the pending connection
-      const pendingConnection = user.connections?.find(
+      const pendingConnection = user?.connections?.find(
         (conn) => conn.user_id === params.userId && conn.status === "pending"
       );
 
@@ -117,11 +119,11 @@ export const useConnections = () => {
       }
 
       // Store original connections for rollback
-      const originalConnections = [...(user.connections || [])];
+      const originalConnections = [...(user?.connections || [])];
 
       // Create optimistic update
       const updatedConnections =
-        user.connections?.map((conn) => {
+        user?.connections?.map((conn) => {
           if (conn.user_id === params.userId && conn.status === "pending") {
             return { ...conn, status: "accepted" };
           }
@@ -131,7 +133,7 @@ export const useConnections = () => {
       // Apply optimistic update
       updateUserInStore({
         ...user,
-        id: user.id,
+        id: user?.id,
         connections: updatedConnections,
       });
 
@@ -150,7 +152,7 @@ export const useConnections = () => {
         // Rollback on error
         updateUserInStore({
           ...user,
-          id: user.id,
+          id: user?.id,
           connections: originalConnections,
         });
 
@@ -172,22 +174,23 @@ export const useConnections = () => {
    */
   const removeConnection = useCallback(
     async (params: RemoveConnectionParams) => {
+      if (!user) return null;
       setIsLoadingConnections(true);
       setConnectionsError(null);
       setLoading(true);
 
       // Store original connections for rollback
-      const originalConnections = [...(user.connections || [])];
+      const originalConnections = [...(user?.connections || [])];
 
       // Apply optimistic update - remove connection
       const updatedConnections =
-        user.connections?.filter(
+        user?.connections?.filter(
           (conn) => conn.connected_user_id !== params.connectedUserId
         ) || [];
 
       updateUserInStore({
         ...user,
-        id: user.id,
+        id: user?.id,
         connections: updatedConnections,
       });
 
@@ -206,7 +209,7 @@ export const useConnections = () => {
         // Rollback on error
         updateUserInStore({
           ...user,
-          id: user.id,
+          id: user?.id,
           connections: originalConnections,
         });
 

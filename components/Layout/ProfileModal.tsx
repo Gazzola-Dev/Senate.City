@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useAppData } from "@/Providers/AppProvider";
+import useAppData from "@/hooks/useAppData";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import {
   Eye,
@@ -54,9 +54,9 @@ export function UserProfileModal({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [formData, setFormData] = useState({
-    name: user.name,
-    subtitle: user.subtitle || "",
-    bio: user.bio || "",
+    name: user?.name,
+    subtitle: user?.subtitle || "",
+    bio: user?.bio || "",
   });
 
   const getInitials = (name: string) => {
@@ -80,7 +80,7 @@ export function UserProfileModal({ children }: { children: React.ReactNode }) {
 
   const handleSaveProfile = () => {
     updateUser({
-      id: user.id,
+      id: user?.id ?? "",
       ...formData,
     });
     setIsOpen(false);
@@ -138,10 +138,12 @@ export function UserProfileModal({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col items-center space-y-4">
                 <Avatar className="h-24 w-24">
                   <AvatarImage
-                    src={user.avatar}
-                    alt={user.name}
+                    src={user?.avatar ?? ""}
+                    alt={user?.name}
                   />
-                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  <AvatarFallback>
+                    {getInitials(user?.name ?? "")}
+                  </AvatarFallback>
                 </Avatar>
                 <Button
                   variant="outline"
@@ -174,7 +176,7 @@ export function UserProfileModal({ children }: { children: React.ReactNode }) {
                   </Label>
                   <Input
                     id="email"
-                    defaultValue={user.email}
+                    defaultValue={user?.email}
                     className="col-span-3"
                     disabled
                   />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppData } from "@/Providers/AppProvider";
+import useAppData from "@/hooks/useAppData";
 import { useCallback } from "react";
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
-import { useAppData } from "@/Providers/AppProvider";
 import * as actions from "@/actions/app.actions";
+import useAppData from "@/hooks/useAppData";
 import { NetworkData, UpdateNetworkDataParams } from "@/types/app.types";
 import { useCallback, useState } from "react";
 
