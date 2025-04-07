@@ -3,7 +3,6 @@ import * as actions from "@/actions/app.actions";
 import useAppData from "@/hooks/useAppData";
 import useSupabase from "@/hooks/useSupabase";
 import { UpdateUserParams } from "@/types/app.types";
-import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,7 +22,6 @@ export const useUser = () => {
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [userError, setUserError] = useState<string | null>(null);
-  const router = useRouter();
   const supabase = useSupabase();
 
   /**
@@ -165,14 +163,13 @@ export const useUser = () => {
     [supabase?.auth]
   );
 
-  /**
-   * Sign out user
-   */
   const signOut = useCallback(async () => {
     try {
       await supabase?.auth.signOut();
       setUser(null);
-      router.refresh();
+
+      window.location.href = "/";
+
       return true;
     } catch (error) {
       const errorMessage =
@@ -180,7 +177,7 @@ export const useUser = () => {
       setUserError(errorMessage);
       return false;
     }
-  }, [setUser, router, supabase]);
+  }, [setUser, supabase]);
 
   return {
     user,

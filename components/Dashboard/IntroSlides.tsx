@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useUser } from "@/hooks/useUser"; // Importing the useUser hook for sign out functionality
 import { cn } from "@/lib/utils";
 import {
   ChevronLeft,
   ChevronRight,
   Github,
+  LogOut,
   Users,
   Youtube,
 } from "lucide-react";
@@ -19,6 +21,7 @@ const IntroSlides = ({ email }: { email: string }) => {
   const totalPages = 5;
   const slideDuration = 4500;
   const progressUpdateInterval = 50; // Update progress every 50ms for smooth animation
+  const { signOut } = useUser(); // Using the sign out function from useUser hook
 
   // Function to reset and restart all timers
   const resetAndRestartTimers = useCallback(() => {
@@ -91,6 +94,11 @@ const IntroSlides = ({ email }: { email: string }) => {
     // Timer will automatically reset because of the useEffect triggered by currentPage change
   };
 
+  // Handler for sign out button
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="h-full w-full flex items-center justify-center pt-24 select-none font-semibold">
       <div className="bg-white rounded-lg shadow-lg w-80 h-120 overflow-hidden relative">
@@ -140,7 +148,9 @@ const IntroSlides = ({ email }: { email: string }) => {
             <p className="text-center text-slate-600">
               This project is open source on{" "}
               <Link
-                rel="noopener noreferrer"
+                className="text-teal-700 underline"
+                target="_blank"
+                rel="noopener noreferrer font-bold italic"
                 href="https://github.com/Gazzola-Dev/Senate.City"
               >
                 Github!
@@ -164,7 +174,7 @@ const IntroSlides = ({ email }: { email: string }) => {
             </p>
           </div>
 
-          {/* Page 5 - Coming Soon */}
+          {/* Page 5 - Coming Soon with Sign Out Button */}
           <div
             className={cn(
               "absolute inset-0 p-6 flex flex-col items-center justify-center transition-opacity duration-500",
@@ -183,10 +193,20 @@ const IntroSlides = ({ email }: { email: string }) => {
               href="https://www.youtube.com/@AzAnything"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center text-blue-500 hover:text-blue-700 mt-2 font-medium"
+              className="block text-center text-blue-500 hover:text-blue-700 mt-2 mb-4 font-medium"
             >
               @AzAnything
             </a>
+
+            {/* Sign Out Button */}
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="mt-2 flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
           </div>
         </div>
 

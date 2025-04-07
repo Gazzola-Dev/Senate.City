@@ -62,12 +62,9 @@ export default function DashboardPage() {
   if (!user) {
     return (
       <div className="flex min-h-screen w-full flex-col items-center justify-center">
-        <div className="w-full max-w-md p-8 space-y-8">
+        <div className="w-full max-w-sm p-8 space-y-8">
           <div className="flex flex-col items-center justify-center gap-6 mb-8">
             <h1 className="text-2xl font-bold text-center">Senate.City</h1>
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Sign in to get started
-            </p>
           </div>
 
           <Form {...form}>
@@ -117,23 +114,6 @@ export default function DashboardPage() {
               </Button>
             </form>
           </Form>
-
-          <div className="mt-8 text-sm text-center text-gray-500">
-            By signing in, you agree to our{" "}
-            <a
-              href="/terms"
-              className="text-blue-600 hover:underline"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="/privacy"
-              className="text-blue-600 hover:underline"
-            >
-              Privacy Policy
-            </a>
-          </div>
         </div>
       </div>
     );
