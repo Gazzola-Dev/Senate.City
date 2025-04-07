@@ -64,11 +64,9 @@ export default function DashboardPage() {
       <div className="flex min-h-screen w-full flex-col items-center justify-center">
         <div className="w-full max-w-md p-8 space-y-8">
           <div className="flex flex-col items-center justify-center gap-6 mb-8">
-            <h1 className="text-2xl font-bold text-center">
-              Welcome to the Dashboard
-            </h1>
+            <h1 className="text-2xl font-bold text-center">Senate.City</h1>
             <p className="text-center text-gray-600 dark:text-gray-400">
-              Sign in to access your dashboard
+              Sign in to get started
             </p>
           </div>
 
