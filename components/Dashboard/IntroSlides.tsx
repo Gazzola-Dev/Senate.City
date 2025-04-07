@@ -121,8 +121,8 @@ const IntroSlides = ({ email }: { email: string }) => {
             </h2>
             <ul className="text-center text-slate-600">
               <li>
-                Because we need transparent, accessible and flexible
-                communication tools
+                We need transparent, accessible and flexible communication
+                tools!
               </li>
             </ul>
           </div>
