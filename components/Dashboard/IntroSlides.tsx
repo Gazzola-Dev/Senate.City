@@ -8,6 +8,7 @@ import {
   Users,
   Youtube,
 } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const IntroSlides = ({ email }: { email: string }) => {
@@ -137,7 +138,13 @@ const IntroSlides = ({ email }: { email: string }) => {
             <Github className="w-16 h-16 mb-6 text-slate-800" />
             <h2 className="text-xl font-bold text-center mb-3">Open Source</h2>
             <p className="text-center text-slate-600">
-              This project is open source on GitHub!
+              This project is open source on{" "}
+              <Link
+                rel="noopener noreferrer"
+                href="https://github.com/Gazzola-Dev/Senate.City"
+              >
+                Github!
+              </Link>
             </p>
           </div>
 
