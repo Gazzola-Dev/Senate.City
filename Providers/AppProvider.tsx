@@ -235,14 +235,18 @@ const Provider = ({ children }: { children: ReactNode }) => {
                 This project is a work in progress. Stay tuned for exciting
                 updates!
               </p>
-
               <a
                 href="https://www.youtube.com/@AzAnything"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-center text-blue-500 hover:text-blue-700 mt-2 mb-4 font-medium"
+                className="flex mt-2 mb-4"
               >
-                @AzAnything
+                <span className="text-gray-500 font-medium italic">
+                  YouTube/
+                </span>
+                <span className="block text-center text-blue-500 hover:text-blue-700 font-medium">
+                  @AzAnything
+                </span>
               </a>
 
               {/* Sign Out Button */}
