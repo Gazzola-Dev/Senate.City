@@ -17,7 +17,7 @@ import useAppData from "@/hooks/useAppData";
 import { useUser } from "@/hooks/useUser";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle, MailOpen } from "lucide-react";
+import { InfoIcon, LoaderCircle, MailOpen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -114,6 +114,36 @@ export default function DashboardPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-4 p-3 border border-green-200 rounded-md bg-green-50 text-sm text-green-700">
+            <div className="flex items-start gap-2">
+              <MailOpen className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <p>
+                <span className="font-medium">Privacy Notice:</span> Your email
+                will not be used for anything other than authentication.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 p-4 border border-gray-200 rounded-md bg-gray-50 text-sm text-gray-600">
+            <div className="flex items-start gap-2">
+              <InfoIcon className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p>
+                <span className="font-medium">Beta Notice:</span> User data will
+                be periodically deleted until the app reaches a stable state.
+                Any data added might be lost at any time, and the user
+                experience could change without notice. To delete your account,
+                please email{" "}
+                <a
+                  href="mailto:az@gazzola.dev"
+                  className="text-blue-600 hover:underline"
+                >
+                  az@gazzola.dev
+                </a>
+                .
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
