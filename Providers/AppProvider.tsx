@@ -38,7 +38,6 @@ interface AppProviderProps {
 const Provider = ({ children }: { children: ReactNode }) => {
   const supabase = useSupabase();
   const [user, setUser] = useState<User | null>(null);
-  const [signedOut, setSignedOut] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -46,14 +45,16 @@ const Provider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") setUser(null);
       const userId = session?.user.id;
-      if (userId && userId !== user?.id && !signedOut) setUser(session.user);
+      if (event === "SIGNED_IN" && userId && userId !== user?.id)
+        setUser(session.user);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, user?.id, setUser, signedOut]);
+  }, [supabase, user?.id, setUser]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -135,9 +136,8 @@ const Provider = ({ children }: { children: ReactNode }) => {
   };
 
   // Handler for sign out button
-  const handleSignOut = () => {
-    setSignedOut(true);
-    setUser(null);
+  const handleSignOut = async () => {
+    await supabase?.auth.signOut();
   };
   if (user)
     return (
